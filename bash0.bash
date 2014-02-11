@@ -1,3 +1,49 @@
+# AIX UNIX Box Computer: LAKRSASPR1;
+# http://publib.boulder.ibm.com/infocenter/aix/v6r1/index.jsp?topic=%2Fcom.ibm.aix.cmds%2Fdoc%2Faixcmds1%2Fawk.htm
+# Username: djanusz;
+# Password: Windows Password;
+#
+# KATE-KONSOLE
+# 1. Focus/Defocus Terminal - Ctrl+Shift+T
+# 2. Pipe to Terminal - Ctrl+Shift+P
+# 3. Go back into Kate - Shift+Tab
+# 4. Ctrl+Shift+C/V to copy/paste in the terminal
+# 5. Window splitting and full screen - Ctrl+Shift+L/R/F
+# 6. Comment or uncomment block Ctrl+D and Ctrl+Shift+D
+# 
+# UNIX Commannds: R (to run R interactively), source("test.r")  to run test.r from the R session
+#         cd pathname, cd .., pwd, ls, ls -al, exit, rscript test.r  
+# 	  gunzip -c filename.tar.gz | tar -xvf -
+#         rm, rmdir, mkdir, cp file1path file2path
+# VIM Commands
+#          :q<enter> to exit
+#          :w filename <enter> to save a file
+#          :help<enter> or F1 for online help
+#
+# R Commands: q() to quit 
+# R default library:
+# 		/home/djanusz/R/powerpc-ibm-aix6.1.0.0-library/2.15/rboot.r
+# R library: 
+# 		/home/djanusz/R/lib
+# SAS connection: 
+#     		/sas02/logistics/ldrtl/djj/mvtnorm_0.9-9994.tar.gz
+# R path:  
+# 	      	/u/psasa05/usr/bin/
+# library '/home/psasa05/opt/freeware/lib/R/library'
+# cp -r /home/djanusz/R/lib/mvtnorm/* /home/psasa05/opt/freeware/lib/R/library/mvtnorm
+# cd ~ takes me to /u/djanusz
+
+
+# SHORTCUT KEYS
+# 1. p+tab (see all commands beginning with p)
+# 2. Ctrl+R/F/G (Reverse/Forward/terminate history search)
+# 3. Ctrl+A/E (Move to start/End of line)
+# 4. Ctrl+K (delete from cursor to end of line)
+# 5. Esc+U/L (Change to Upper/Lower case)
+# 6. Ctrl+D (EOF marker)
+
+
+
 #manual of the man command
 man man #spacebar to move forward, Esc,V to move back, / to search and Q to exit
 #view section 5 (file formats) of the passwd command
@@ -350,7 +396,134 @@ cat hwpii.txt hwpII.txt > hwp2.txt
 cat hwpii.txt hwpII.txt hwp2.txt
 #paginate with more or less. Spacebar to move forward, b to ove backward and q to quit
 more faces.java
-
-
+################hardware components#############
+#Force the computer to shut down
+sudo poweroff -f
+#reboot
+sudo reboot
+#add new user
+sudo useradd djanusz
+sudo passwd djanusz
+grep djanusz /etc/passwd
+#switch to new user, print the new users name, then logout
+su - djanusz
+whoami
+exit
+#delete user
+sudo deluser djanusz
+# add a new user with the home directory /home/sas02
+sudo useradd -m -s /bin/bash -d /home/djanusz djanusz
+#The list hardware command lshw
+sudo apt-get install lshw-gtk
+#X Windows interface to this command
+sudo lshw -X 
+time sudo lshw -html > ~/Documents/lshw.html
+sudo lshw -xml > ~/Documents/lshw.xml
+sudo lshw -json > ~/Documents/lshw.js
+sudo lshw -short > ~/Documents/lshwshort.txt
+sudo lshw -businfo > ~/Documents/lshwbus.txt
+#view the number of users
+cat /etc/passwd
+#install some other shells
+sudo apt-get install csh
+sudo apt-get install ksh
+#change the default shell for ordinary users (enter /bin/csh when prompted)
+chsh
+#change between bash and csh
+bash
+csh
+#view the shells on your system
+cat /etc/shells
+#run a short shell script
+sh ./myVeryFirst.sh
+#using bash also works to run shell scripts with the .sh extension
+bash ./myVeryFirst.sh
+#change the permissions on the shell script
+chmod 751 myVeryFirst.sh
+#read write, execute for everyone (111 in binary, or 7 in decimal, is rwx)
+chmod 777 myVeryFirst.sh
+#once it is executable, you ccan run it like other commands
+myVeryFirst.sh
+#Or if the directory is not in the PATH variable
+./myVeryFirst.sh
+#Create a shell variable (note that there is no whitespace around a shell variable)
+dog="fido"
+echo "Don't let $dog near the river"
+#weak quote allows interpretation of variables/parameter including the following positional parameter
+echo "the average pay is $1000"
+#strong quote allows substitution of characters
+echo 'the average pay is $1000'
+#the backslash is like the strong quote
+echo the average pay is \$1000
+#weak quotes to show the variables (variable evaluation)
+echo "$dog"
+#strong quotes and we don't see the variables
+echo '$dog'
+#weak quotes allows command substitution and variable evaluation
+echo "The PATH variable is $PATH and the current directory is `pwd`"
+#command substitution
+mydir=`pwd`; echo $mydir
+#command substitution with and without quotes (the quotes make a trailing newline after each directory listing)
+dirListing=`ls -l`
+echo $dirListing
+echo "$dirListing"
+# Shell variables postional parameters command-line arguments
+set A B C
+echo $2 $3
+echo $#
+echo $0
+echo $*
+# Using arguments to the previous command  (enter the bar directory with $_)
+mkdir bar
+cd $_
+#create some files and display thier content
+cd ~/Documents
+mkdir bar
+cd bar
+vi some.sh
+vi somemore.sh
+touch some.sh somemore.sh
+mkdir backup
+cat some.sh somemore.sh
+cp !* ./backup  #pass all arguments from the previous command
+#There are 3 types of variables: 1. Shell, 2. Configuration and 3. Environment (Local or Global)
+env #list environmet variables
+#list environment variables (PATH has the paths that are searched for commands)
+printenv
+# view the PATH environment variable (a colon-separated list of directories)
+echo $PATH
+# create a local variable and then export it to the environment
+DOCPATH=/home/dave/Documents
+export DOCPATH
+env | grep DOC
+#add the Downoads directory and your current directory to the environment variable
+export DOCPATH2=$PATH:/dave/home/Downloads:.
+echo $DOCPATH2
+# set the variable to readonly
+readonly DOCPATH2
+# save the current prompt as another environment variable
+MYPROMPT=$PS1
+echo $MYPROMPT
+# revert to your original prompt as needed
+PS1=$MYPROMPT
+# Customize the prompt - display the time of day and the number of jobs that you are running
+export PS1="[\t \j]"
+# change the prompt display to: username-host jobs shell version directory
+export PS1="\H \j \s \v \w >"
+# display the directory and user information ($ indicates user is root)
+export PS1="\$PWD (\w) \$ >"
+# Customers a user's bash shell
+cd ~ # go to home directory
+ls -al #view all files including hidden
+cat .bashrc
+cp .bashrc .bashrcOG
+vi .bashrc # add PS1="\$PWD (\w) \$ >" to the end to customize your bash script
+# make some alaises
+alias ll="ls -al"
+ll
+# make a backup of the .profile file and add in some useful aloiases
+cd ~
+cp .profile .profileOG
+vi .profile # add in who="who | sort"
 
 
