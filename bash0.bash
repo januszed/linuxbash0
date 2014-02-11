@@ -1,4 +1,3 @@
-
 # VIM Commands: i for insert and <esc> for command mode
 #          :q<enter> to exit
 #          :w filename <enter> to save a file
@@ -485,5 +484,24 @@ ll
 cd ~
 cp .profile .profileOG
 vi .profile # add in who="who | sort"
+#compare two numbers in a bash script
+#enter the following in a text file called compareTwoNums:
+#compare two numbers entered by the user
+read -p "Please enter two different numbers (num1 and num2):" num1 num2
+if [ $num1 -eq $num2 ]
+then
+        echo "You entered two equal numbers: " $num1
+else
+        if [ $num1 -gt $num2 ]
+        then
+                echo "num1: $num1 is greater than num2: $num2."
+        else
+                echo "num2: $num2 is greater than num1: $num1."
+        fi
+        
+fi
+#execute the script using chmod +x
+chmod +x compareTwoNums
+compareTwoNums
 
 
