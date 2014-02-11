@@ -1,48 +1,8 @@
-# AIX UNIX Box Computer: LAKRSASPR1;
-# http://publib.boulder.ibm.com/infocenter/aix/v6r1/index.jsp?topic=%2Fcom.ibm.aix.cmds%2Fdoc%2Faixcmds1%2Fawk.htm
-# Username: djanusz;
-# Password: Windows Password;
-#
-# KATE-KONSOLE
-# 1. Focus/Defocus Terminal - Ctrl+Shift+T
-# 2. Pipe to Terminal - Ctrl+Shift+P
-# 3. Go back into Kate - Shift+Tab
-# 4. Ctrl+Shift+C/V to copy/paste in the terminal
-# 5. Window splitting and full screen - Ctrl+Shift+L/R/F
-# 6. Comment or uncomment block Ctrl+D and Ctrl+Shift+D
-# 
-# UNIX Commannds: R (to run R interactively), source("test.r")  to run test.r from the R session
-#         cd pathname, cd .., pwd, ls, ls -al, exit, rscript test.r  
-# 	  gunzip -c filename.tar.gz | tar -xvf -
-#         rm, rmdir, mkdir, cp file1path file2path
-# VIM Commands
+
+# VIM Commands: i for insert and <esc> for command mode
 #          :q<enter> to exit
 #          :w filename <enter> to save a file
-#          :help<enter> or F1 for online help
-#
-# R Commands: q() to quit 
-# R default library:
-# 		/home/djanusz/R/powerpc-ibm-aix6.1.0.0-library/2.15/rboot.r
-# R library: 
-# 		/home/djanusz/R/lib
-# SAS connection: 
-#     		/sas02/logistics/ldrtl/djj/mvtnorm_0.9-9994.tar.gz
-# R path:  
-# 	      	/u/psasa05/usr/bin/
-# library '/home/psasa05/opt/freeware/lib/R/library'
-# cp -r /home/djanusz/R/lib/mvtnorm/* /home/psasa05/opt/freeware/lib/R/library/mvtnorm
-# cd ~ takes me to /u/djanusz
-
-
-# SHORTCUT KEYS
-# 1. p+tab (see all commands beginning with p)
-# 2. Ctrl+R/F/G (Reverse/Forward/terminate history search)
-# 3. Ctrl+A/E (Move to start/End of line)
-# 4. Ctrl+K (delete from cursor to end of line)
-# 5. Esc+U/L (Change to Upper/Lower case)
-# 6. Ctrl+D (EOF marker)
-
-
+#          ZZ save and close
 
 #manual of the man command
 man man #spacebar to move forward, Esc,V to move back, / to search and Q to exit
