@@ -1,8 +1,9 @@
-# VIM Commands: i for insert and <esc> for command mode
+# GITHUB Page
+#       https://github.com/januszed/linuxbash0/blob/master/bash0.bash#L496
+# VIM Commands
 #          :q<enter> to exit
 #          :w filename <enter> to save a file
-#          ZZ save and close
-
+#          :help<enter> or F1 for online help
 #manual of the man command
 man man #spacebar to move forward, Esc,V to move back, / to search and Q to exit
 #view section 5 (file formats) of the passwd command
@@ -17,7 +18,7 @@ whatis cal
 apropos cal
 #help on the ls command
 ls --help
-#list all files that start with the word linux
+#list all files that start with the word linux (asterisk wildcard)
 ls linux*
 #change wd
 cd Documents
@@ -490,18 +491,174 @@ vi .profile # add in who="who | sort"
 read -p "Please enter two different numbers (num1 and num2):" num1 num2
 if [ $num1 -eq $num2 ]
 then
-        echo "You entered two equal numbers: " $num1
+echo "You entered two equal numbers: " $num1
 else
-        if [ $num1 -gt $num2 ]
+if [ $num1 -gt $num2 ]
         then
-                echo "num1: $num1 is greater than num2: $num2."
+echo "num1: $num1 is greater than num2: $num2."
         else
-                echo "num2: $num2 is greater than num1: $num1."
+echo "num2: $num2 is greater than num1: $num1."
         fi
-        
 fi
 #execute the script using chmod +x
 chmod +x compareTwoNums
 compareTwoNums
-
-
+# Excecuting programs in different programming languages
+# Gibbs sampler algorithm obtained from 
+# http://darrenjw.wordpress.com/2011/07/16/gibbs-sampler-in-various-languages-revisited/
+# Store the programs in ~/Documents/Gibbs
+# Changed the parameters to N=5000 and thin=100 for a faster program executions
+cd ~
+cd ./Documents/Gibbs
+# run an R program from the Linux command line
+time Rscript gibbs.r
+# run the second R program from the Linux command line and re-direct the output to a file
+time Rscript gibbs2.r > datar.tab
+Rscript gibbs_compare.r
+kde-open Rplots.pdf
+# Create an alias to open pdf files with open
+cd ~
+vi .bashrc #alias open='kde-open'  (exit the terminal and re-open so that the alias will work)
+cd ~/Documents/Gibbs
+open Rplots.pdf
+# Open the R environment from the Linux command line
+exec R
+# Run the gibbs program in the Python programming language
+time python gibbs.py > datapy.tab
+less datapy.tab
+#view where C stores the header files
+`gcc -print-prog-name=cc1` -v
+# tell C to link to the header files in /usr/include so that the math.h header file links
+C_INCLUDE_PATH=/usr/include
+echo $C_INCLUDE_PATH
+export C_INCLUDE_PATH
+gcc gibbs.c -o gibbs -lm -lgsl -lgslcblas
+time ./gibbs > datac.tab
+# Sort, Cut and Paste Text files
+info coreutils 'sort invocation' # the complete manual for sort
+# GNU Core Utilities are the basic file, shell and text manipulation utilities of the GNU operating system
+man cut -dk
+comm --help
+#    The defaults are:
+# * the join field is the first field in each line;
+# * fields in the input are separated by one or more blanks, with
+#   leading blanks on the line ignored;
+# * fields in the output are separated by a space;
+# * each output line consists of the join field, the remaining fields
+#   from FILE1, then the remaining fields from FILE2.
+man sort
+# enter the following into text files 
+# vi text1.data
+2 jane 45000
+1 joe 33000
+3 jessica 50000
+9 pacha 25000
+10 john 60000
+# vi text2.data
+3 peter 60000
+1 paul 70000
+2 pam 80000
+9 pacha 25000
+#vi text3.data
+2,"sam snead",48000
+1,"sona sanchez",55000
+3,"stacey smith",72000
+# sorting files with no options
+sort text1.data > sorted1.data
+sort text1.data > sorted1
+cat sorted1
+sort text2.data > sorted2.data
+sort text2.data > sorted2
+cat sorted2
+ll | grep sorted
+# delete both files (you can perform batch operations with braces {} )
+rm sorted{1,2}
+ll | grep sorted
+# extract the first columns only (note the file is delimited by commas)
+cut -d, -f1 text3.data
+# extract the second and third colums
+cut -d, -f2-3 text3.data
+# extract the first and third column
+cut -d, -f1,3 text3.data
+# extract the third column from the space delimited text1.data file
+cut -d" " -f3 text1.data
+# sort the space delimted text2.data file on the 3rd field and redirect the results to sorted2on3
+sort -t" " -k 3 text2.data > sorted2on3
+# display both files one ontop of the other (append vertically without any matching)
+cat text2.data sorted2on3
+# line the data files up side by side (append horizontally without any matching)
+paste text1.data text2.data
+# transform the data into one row
+paste -s text2.data
+# transform the data to two rows (from 4x3 to 2X6)
+paste -s -d'\t\n' text2.data
+# cut the second column from text2.data and append that horizontally to text3.data
+cut -d' ' -f2 text2.data | paste - text3.data
+# compare two sorted files with comm
+comm sorted1.data sorted2.data
+# the vertical intersection of the data files (sql sorted1.data intersect sorted2.data)
+comm -12 sorted1.data sorted2.data
+# the vertical exception (sql sorted1.data except sorted2.data)
+comm -13 sorted1.data sorted2.data
+# the vertical exception (sql sorted2.data except sorted1.data)
+comm -23 sorted1.data sorted2.data
+# show everything except the intersection of the two files
+diff sorted1.data sorted2.data
+# products.data
+# vi products.data
+4321:watch:200
+4321:video-game:500
+5678:cd-rom:150
+5678:dvd:2000
+8765:phone:3500
+# vi names.data 
+1234:Johnson:Bob
+4321:Jones:Jim
+5678:Smith:Dave
+7777:Brown:Tim
+8765:Martin:Peter
+# horizontal joins based on matching columns
+join -t: names.data products.data
+# join using the -o option with a field list to perform intricate joins
+join -t: -o 1.2 2.3 2.2 names.data products.data > purchases
+# print the purchases on a double spaced page in the terminal
+pr -d -h 'Products Purchased' purchases
+# using awk in a similar fashion to a filter (sql where clause)
+awk '/joe/{print}' sorted1.data 
+# The string /joe/ is the awk target, and the action (in braces) is to print the third field
+awk '/joe/{print $3}' sorted1.data
+# The delimiter is a colon and the action is to print the second and third columns
+awk -F: '/Jones/{print $2,$3}' names.data
+# create the employees file
+# vi employees
+409,John Baker,56000,civil engineering
+678,Fred Smith,73000,physics
+429,Julia Tanguay,47000,computer science
+349,Peggy Bantin,67000,Physics
+268,Mario Hodgkins,55000,programming
+# Display all records of employees teaching in the physics department
+awk -F, '/physics/ {print}' employees
+# Display employee name and department from all records
+awk -F, '{print $2, $4}' employees
+# Extract all records of employees teaching in the physics department, and display
+# their names and salary and ignore case
+awk -F, '/[Pp]hysics/{print $2, $3}' employees
+# Selecting lines by field value. Display records where the salaries are: 55000
+awk -F, '$3 == 55000' employees
+# Display records where the salaries are less than 55000
+awk -F, '$3 < 55000' employees
+# Display records where the salaries are more than 55000
+awk -F, '$3 > 55000' employees
+# Display records of employees working either in the physics or programming departments
+awk -F, '/[Pp}hysics|programming/{print}' employees
+# Display records for employees who work in computer science
+awk -F, '$4=="computer science"' employees
+# Display records for employees who makemore than $55,000 but less than $70,000
+awk -F, '$3>55000 && $3<70000' employees
+# Display records for employees who make more than $55,000 OR less than $20,000
+awk -F, '$3 > 55000 || $3 < 20000' employee
+# Complex awk scripts (create the awktest.awk file from the long command below) 
+# vi awktesst.awk
+/physics/{name= $2 salary=$3 print " employee name is: "name print " employee salary is: "salary}
+# run the .awk file
+awk -F, -f awktest.awk employees
