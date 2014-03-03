@@ -1,9 +1,54 @@
-# GITHUB Page
-#       https://github.com/januszed/linuxbash0/blob/master/bash0.bash#L496
-# VIM Commands
+######################################################################################################################## 
+# Github Page
+#         https://github.com/januszed/linuxbash0/blob/master/bash0.bash#L496
+#
+# Kate-Konsole Shortcut Keys
+#        Focus/Defocus Terminal - Ctrl+Shift+T
+#        Pipe to Terminal - Ctrl+Shift+P
+#        Go back into Kate - Shift+Tab
+#        Ctrl+Shift+C/V to copy/paste in the terminal
+#        Window splitting and full screen - Ctrl+Shift+L/R/F
+#        Comment or uncomment block Ctrl+D and Ctrl+Shift+D
+#        Move line up/down with Ctrl+Shift+Up/Down
+#
+# Bash Shortcut Keys
+#         p+tab (see all commands beginning with p)
+#         Ctrl+R/F/G (Reverse/Forward/terminate history search)
+#         Ctrl+A/E (Move to start/End of line)
+#         Ctrl+K (delete from cursor to end of line)
+#         Esc+U/L (Change to Upper/Lower case)
+#         Ctrl+D (EOF marker)
+#
+# Vim Commands
 #          :q<enter> to exit
 #          :w filename <enter> to save a file
 #          :help<enter> or F1 for online help
+#          bash $vim filename.txt 
+#          i for insert mode
+#          <Esc> for command mode
+#          ZZ - command mode to save and exit
+#          :w save
+#          !q - quit without saving
+#          ^F,^Y,^B,^E - forward/backward one page/line
+#          h,j,k,l - left,down,up,right (j looks like an arrow pointing down)
+#          x,dw,dd,9dd - delete character, word, line, 9 lines
+#          w,e - move to next/end of word
+#          dd,y,p - cut, copy, paste
+#          dd,D - delete current line, to the end of the line
+#          o,O - insert new line below/above cursor
+#          r,R - replace one/many characters
+#          v,V - visual mode to select text
+#          x,X - delete character under/before cursor
+#          u,^R - undo, redo
+#          ^,$ - first/last character of line
+#          (),{} - beginning of previous/next line/paragraph
+#          #,* - search backward/forward for word under the cursor
+#          /,? - search mode forward/backword (n to go to to the next occurence)
+#          :h vi-differences - differences between Vi and Vim
+#          :sh - start the command line
+#          /etc/vim/vimrc - config file can be edited to customize commands
+#                    (e.g.  map <Esc><Esc> :w<CR>  for triple Esc to save)
+########################################################################################################################
 #manual of the man command
 man man #spacebar to move forward, Esc,V to move back, / to search and Q to exit
 #view section 5 (file formats) of the passwd command
@@ -36,6 +81,10 @@ ls -ul
 ls -i
 #list file types (directory /, executable *, symbolic link @)
 ls -F
+# list files by size
+ls -al --sort=size
+du -s * | sort -n
+for entry in $(ls); do du -s "$entry"; done | sort -n
 #make a directory
 mkdir abc
 mkdir abcd
@@ -508,20 +557,19 @@ compareTwoNums
 # http://darrenjw.wordpress.com/2011/07/16/gibbs-sampler-in-various-languages-revisited/
 # Store the programs in ~/Documents/Gibbs
 # Changed the parameters to N=5000 and thin=100 for a faster program executions
-cd ~
-cd ./Documents/Gibbs
-# run an R program from the Linux command line
+cd /home/dave/Documents/Gibbs
 time Rscript gibbs.r
-# run the second R program from the Linux command line and re-direct the output to a file
 time Rscript gibbs2.r > datar.tab
 Rscript gibbs_compare.r
 kde-open Rplots.pdf
+#save the above and run it in a script today (schedule to run with the Bourne shell)
+at -f rungibbs.bash 3:18 am today
 # Create an alias to open pdf files with open
 cd ~
 vi .bashrc #alias open='kde-open'  (exit the terminal and re-open so that the alias will work)
 cd ~/Documents/Gibbs
 open Rplots.pdf
-# Open the R environment from the Linux command line
+# Run R interactively (enter source("test.r") to run test.r from the R session)
 exec R
 # Run the gibbs program in the Python programming language
 time python gibbs.py > datapy.tab
@@ -662,3 +710,242 @@ awk -F, '$3 > 55000 || $3 < 20000' employee
 /physics/{name= $2 salary=$3 print " employee name is: "name print " employee salary is: "salary}
 # run the .awk file
 awk -F, -f awktest.awk employees
+# Networking Commands
+# the machines hostname
+hostname
+# the domain name that the machine belongs to
+hostname -d
+# the fully qualified host and domain name
+hostname -f
+# the IP address
+hostname -i
+# see the IP of google by sending packets (Ctrl+C to stop)
+ping www.google.com
+# view network configuration
+ifconfig
+# the multicast groups (network) subscribed by this host
+netstat -g
+# display process id of an application being used at that port
+netstat -nap | grep port
+# display all connections using TCP and UDP
+netstat -a
+# display only the TCP connection
+netstat --tcp
+# find the IP address for a given domain name
+nslookup www.google.com
+# traceroute is a utility to view the number of hops to get to a remote system
+traceroute www.loblaw.ca
+# display the user's login name, terminal name and write status
+finger
+# adding and removing users and groups
+groupadd grp2
+# modify a group
+sudo groupmod -n grp21 grp2
+# delete the group
+sudo groupdel grp21
+# view the groups
+cat /etc/group
+# create a new directory and add a user there
+cd /home
+mkdir januszed21
+sudo useradd -d /home/januszed21 -g grp21 -m -s /bin/ksh -u 887 januszed21
+# view the password file which has usernames
+sudo cat /etc/passwd
+# update a password for a user
+sudo passwd januszed88
+# view the encrypted password of accounts
+sudo cat /etc/shadow
+# view the secure group account information
+sudo cat /etc/gshadow
+# Shell Operators and Shell Scripting
+let x=14+5+4*8; echo $x
+let y=(14+5)+4*8; echo $y
+let z=(14+5+4)*8; echo $z
+#!/bin/bash
+#Program name: add.sh
+#Description: display and add two numbers
+let a=1
+let b=2
+let sum=$a+$b
+echo "a=$a, b=$b and sum=$sum"
+#!/bin/bash
+# Description: show some examples of the test and expr command
+#            the exit status is 0 for T and 1 for F in the test command
+#            and the opposite for Boolean evaluations in the expr command.
+number=20
+test $number -eq 20
+echo $?
+value=10
+test $number -lt $value
+echo $?
+name="Linus"
+test $name="Linus"
+echo $?
+test $name="Brian"
+echo $?
+#create an empty file and test if the file is executable
+touch testfile
+ls -l testfile
+test -x testfile
+echo $?
+test -r testfile
+echo $?
+# the expr command for math. Asterisk must be escaped so that 
+# it is not confused with the wildcard. Parenthesis must also be escaped.
+# Each argument must be separated by whitespace.
+expr 7 + 3
+expr 7 \* 3
+expr 7 \* \( 3 + 1 \)
+expr 7 = 0
+expr length "Linux is the best"
+expr substr "Linux is the best" 7 8
+expr index "Linux is the best" "x" 
+# Enter the following into the data1 file for the grep example that follows
+Harry is smart
+Harry
+His name is Harry
+His name is Harry Potter
+The dog likes bones.
+I know who you are and I saw what you did.
+Who knows what lurks in the hearts of men?
+color
+colour
+# Find all lines that contain the pattern "Harry"
+grep Harry data1
+# Find lines that begin with "Harry"
+grep '^Harry' data1
+# Find lines begin and end with "Harry"
+grep '^Harry$' data1
+# look for empty lines
+grep '^$' data1
+# find all lines that contain the word starting with "kn"
+grep '\<kn' data1
+# find all lines that contain the word ending with "ow"
+grep 'ow\>' data1
+# find all lines that contain the word "colour" or "color"
+grep 'colou*r' data1
+# What are all the English words that begin with “qu”?
+grep '^qu' /usr/share/dict/words | less
+# What are all the English words that end with “y”?
+grep 'y$' /usr/share/dict/words | less
+# What are all the English words that begin with “qu” have one more letter, then ends with “y”?
+grep '^qu[a-z]y$' /usr/share/dict/words
+# What are all the English words that begin with “qu” has two more letters and then ends with “y”?
+grep '^qu[a-z][a-z]y$' /usr/share/dict/words
+# What are all the English words that begin with “qu” has three more letters and then ends with “y”?
+egrep '^qu[a-z]{3}y$' /usr/share/dict/word
+# The grep command makes use of regular expressions (regex) syntax
+# the num.list file
+ 1	15	fifteen
+ 2	14	fourteen
+ 3	13	thirteen
+ 4	12	twelve
+ 5	11	eleven
+ 6	10	ten
+ 7	9	nine
+ 8	8	eight
+ 9	7	seven
+10	6	six
+11	5	five
+12	4	four
+13	3	three
+14	3	two
+15	1	one
+# print to stdout, the lines that contain '15'
+grep '15' num.list
+# count the number of occurrences of '15'
+grep -c '15' num.list
+# the occurences of 1 followed by 1,2 or 5
+grep '1[125]' num.list
+# lines that begin with a space
+grep '^ ' num.list
+# lines that do not begin with a space
+grep '^[^ ]' num.list
+# lines that do not begin with a space (invert the matching, so that you get non-matching lines)
+grep -v '^ ' num.list
+# lines that begin with the numbers 1 to 9
+grep '^[1-9]' num.list
+# lines that contain "t"
+grep 'te*' num.list
+# lines that contain "te"
+grep 'tee*' num.list
+# view the users logged into psuedoterminals (pts)
+who | grep 'pts'
+# Create a new file called young and enter the text the "the night is young"
+vim young
+# Find and replace the word night with day and save the file as youngday
+sed 's/night/day/' young>youngday
+# This outputs the word "Sunnight Monday"
+echo Sunday Monday | sed 's/day/night/'
+# Find and replace all with the "g" for global at the end of the command "Sunnight Monnight"
+echo Sunday Monday | sed 's/day/night/g'
+# Enter the following text into a file named sample1
+one	1
+two	1
+three	1
+one 	1
+two	1
+two	1
+three	1
+# Replace "1" with "2", but only after the word two
+sed '/two/ s/1/2/' sample1>sample2
+# find and replace 1 with 2 on only the fifth and sixth lines
+sed '5,6 s/1/2/' sample1>sample2
+# print out only lines 3 to 6
+sed -n '3,6p' sample1
+# delete all lines containing the word "two"
+sed '/two/ d' sample1>sample2
+# delete everything from line 2 up until the end
+sed '2,/^$/ d' sample1>sample2
+# delete all lines except for ones that contain the phrase "two"
+sed '/two/ !d' sample1>sample2
+cat sample2
+#!/bin/bash
+# Description: Write a shell script whose single command line argument is a file. If you run the
+#              program with an ordinary file, the program displays the owner’s name and last
+#              update time for the file.
+echo "Enter a filename: "
+read filename
+test -z "$filename"
+echo $?
+test -f "$filename" 
+echo $?
+echo
+if [ -f "$filename" ];then
+  echo “The owner and last update time for $filename is “
+  ls -l "$filename" | tr -s ' ' | cut -d' ' -f3,8
+elif [ -z "$filename" ];then
+  echo "You didn't enter anything"
+else
+  echo “$filename is not an ordinary file”
+fi
+#!/bin/bash
+#Description: reports the files and directories in the cwd
+for x in $( ls -a ); do
+if [ -f $x ] 
+then
+	NUMOFLINES=$(wc -l < $x)
+	echo "File: $x, it has: $NUMOFLINES lines"
+else
+	if [ -d $x ]
+	then
+		echo "Directory: $x."
+	else
+		echo "This is neither a file nor a directory!:  $x."
+	fi
+fi
+done
+#!/bin/bash
+#Description: prompt the user to enter a number and use that number to calculate the factorial of 
+#             the number that the user entered and then output the result to stdout.
+echo "Enter a number"
+read num
+number=$num
+fact=1
+while [ $num -ge 1 ]
+do
+  fact=$(expr $fact \* $num)
+  num=$(expr $num - 1)
+done
+echo "The factorial of $number is $fact"
+
