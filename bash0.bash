@@ -1,6 +1,9 @@
-######################################################################################################################## 
+###################################################################################################################
 # Github Page
 #         https://github.com/januszed/linuxbash0/blob/master/bash0.bash#L496
+#
+# Examples sourced from the course SYST13416 at Sheridan College: http://www.sheridancollege.ca/
+# Scripts sourced from the Linux Documentation Project at: http://tldp.org/index.html
 #
 # Kate-Konsole Shortcut Keys
 #        Focus/Defocus Terminal - Ctrl+Shift+T
@@ -900,6 +903,24 @@ sed '2,/^$/ d' sample1>sample2
 # delete all lines except for ones that contain the phrase "two"
 sed '/two/ !d' sample1>sample2
 cat sample2
+################################################################################################################
+#!/bin/bash
+#Description: a short list of my hobbies
+echo "The things that I like to do include: "
+for myhobbies in smoke, drink, rap
+do
+        echo $myhobbies
+done
+############################################################################################################
+#!/bin/bash
+#Description: Inputs a list and prints it out (save your list of hobbies in a file called myhob in the cwd)
+echo "My full list of hobbies includes: "
+for hob in `cat myhob`
+do
+        echo $hob
+done
+
+################################################################################################################
 #!/bin/bash
 # Description: Write a shell script whose single command line argument is a file. If you run the
 #              program with an ordinary file, the program displays the owner’s name and last
@@ -919,6 +940,7 @@ elif [ -z "$filename" ];then
 else
   echo “$filename is not an ordinary file”
 fi
+###########################################################################################################
 #!/bin/bash
 #Description: reports the files and directories in the cwd
 for x in $( ls -a ); do
@@ -935,6 +957,7 @@ else
 	fi
 fi
 done
+#################################################################################################################
 #!/bin/bash
 #Description: prompt the user to enter a number and use that number to calculate the factorial of 
 #             the number that the user entered and then output the result to stdout.
@@ -948,4 +971,545 @@ do
   num=$(expr $num - 1)
 done
 echo "The factorial of $number is $fact"
+##############################################################################################################
+#! /bin/bash
+# blank-rename.sh
+# Replaces blanks with underscores in all the filenamis in the current directory.
+ONE=1                     # For getting singular/plural right (see below).
+number=0                  # Keeps track of how many files actually renamed.
+FOUND=0                   # Successful return value.
+curdir=$(pwd)
+echo "Replacing blanks with underscores in $curdir." 
+for filename in *             #Traverse all files in directory.
+do
+     echo "$filename" | grep -q " "         #  Check whether filename
+     if [ $? -eq $FOUND ]                   #  contains space(s).
+     then
+       fname=$filename                      # Yes, this filename needs work.
+       n=`echo $fname | sed -e "s/ /_/g"`   # Substitute underscore for blank.
+       mv "$fname" "$n"                     # Do the actual renaming.
+       let "number += 1"
+     fi
+done   
+if [ "$number" -eq "$ONE" ]             
+then
+ echo "$number file renamed."
+else 
+ echo "$number files renamed."
+fi 
+exit 0
+###########################################################################################################
+#!/bin/bash
+# Description: Number of days between two dates.
+# Usage: ./daysbtw.bash [M]M/[D]D/YYYY [M]M/[D]D/YYYY
+#        for example, use the command
+#        $ bash daysbtw.bash 10/10/2010 10/10/2014
 
+ARGS=2                # Two command-line parameters expected.
+E_PARAM_ERR=85        # Param error.
+
+REFYR=1600            # Reference year.
+CENTURY=100
+DIY=365
+ADJ_DIY=367           # Adjusted for leap year + fraction.
+MIY=12
+DIM=31
+LEAPCYCLE=4
+MAXRETVAL=255         #  Largest permissible
+                      
+diff=                 # Declare global variable for date difference.
+value=                # Declare global variable for absolute value.
+day=                  # Declare globals for day, month, year.
+month=
+year=
+
+Param_Error ()        # Command-line parameters wrong.
+{
+  echo "Usage: `basename $0` [M]M/[D]D/YYYY [M]M/[D]D/YYYY"
+  echo "       (date must be after 1/3/1600)"
+  exit $E_PARAM_ERR
+}  
+
+Parse_Date ()                 # Parse date from command-line params.
+{
+  month=${1%%/**}
+  dm=${1%/**}                 # Day and month.
+  day=${dm#*/}
+  let "year = `basename $1`"  # Not a filename, but works just the same.
+}  
+
+check_date ()                 # Checks for invalid date(s) passed.
+{
+  [ "$day" -gt "$DIM" ] || [ "$month" -gt "$MIY" ] ||
+  [ "$year" -lt "$REFYR" ] && Param_Error
+  # Exit script on bad value(s).
+  # Uses or-list / and-list.
+  #
+  # Exercise: Implement more rigorous date checking.
+}
+
+strip_leading_zero () #  Better to strip possible leading zero(s)
+{                     #+ from day and/or month
+  return ${1#0}       #+ since otherwise Bash will interpret them
+}                     #+ as octal values (POSIX.2, sect 2.9.2.1).
+
+day_index ()          # Gauss' Formula:
+{                     # Days from March 1, 1600 to date passed as param.
+                      #           ^^^^^^^^^^^^^
+  day=$1
+  month=$2
+  year=$3
+  let "month = $month - 2"
+  if [ "$month" -le 0 ]
+  then
+    let "month += 12"
+    let "year -= 1"
+  fi  
+  let "year -= $REFYR"
+  let "indexyr = $year / $CENTURY"
+  let "Days = $DIY*$year + $year/$LEAPCYCLE - $indexyr \
+              + $indexyr/$LEAPCYCLE + $ADJ_DIY*$month/$MIY + $day - $DIM"
+  echo $Days
+
+}  
+
+calculate_difference ()            # Difference between two day indices.
+{
+  let "diff = $1 - $2"             # Global variable.
+}  
+
+abs ()                             #  Absolute value
+{                                  #  Uses global "value" variable.
+  if [ "$1" -lt 0 ]                #  If negative
+  then                             #+ then
+    let "value = 0 - $1"           #+ change sign,
+  else                             #+ else
+    let "value = $1"               #+ leave it alone.
+  fi
+}
+
+if [ $# -ne "$ARGS" ]              # Require two command-line params.
+then
+  Param_Error
+fi  
+Parse_Date $1
+check_date $day $month $year       #  See if valid date.
+strip_leading_zero $day            #  Remove any leading zeroes
+day=$?                             #+ on day and/or month.
+strip_leading_zero $month
+month=$?
+let "date1 = `day_index $day $month $year`"
+Parse_Date $2
+check_date $day $month $year
+strip_leading_zero $day
+day=$?
+strip_leading_zero $month
+month=$?
+date2=$(day_index $day $month $year) # Command substitution.
+calculate_difference $date1 $date2
+abs $diff                            # Make sure it's positive.
+diff=$value
+echo $diff
+exit 0
+##############################################################################################################
+#!/bin/bash
+# mkdict.bash  [make dictionary]
+# Modification of /usr/sbin/mkdict (/usr/sbin/cracklib-forman) script.
+# Original script copyright 1993, by Alec Muffett.
+# Description:  This script processes text files to produce a sorted list of words found in the files.
+# Example of Usage :  $ bash mkdict.bash filetoprocess.txt > savetofile.txt
+
+E_BADARGS=85
+
+if [ ! -r "$1" ]                    #  Need at least one
+then                                #+ valid file argument.
+  echo "Usage: $0 files-to-process"
+  exit $E_BADARGS
+fi  
+
+cat $* |                            #  Dump specified files to stdout.
+        tr A-Z a-z |                #  Convert to lowercase.
+        tr ' ' '\012' |             #  New: change spaces to newlines.
+#       tr -cd '\012[a-z][0-9]' |   #  Get rid of everything
+                                    #+ non-alphanumeric (in orig. script).
+        tr -c '\012a-z'  '\012' |   #  Rather than deleting non-alpha
+                                    #+ chars, change them to newlines.
+        sort |                      #  $SORT options unnecessary now.
+        uniq |                      #  Remove duplicates.
+        grep -v '^#' |              #  Delete lines starting with #.
+        grep -v '^$'                #  Delete blank lines.
+
+exit $?
+###########################################################################################################
+#!/bin/bash
+#  Description: Random password generator for Bash 2.x
+# Usage: bash passgen.bash
+MATRIX="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+# ==> Password will consist of alphanumeric characters.
+LENGTH="8"
+# ==> May change 'LENGTH' for longer password.
+while [ "${n:=1}" -le "$LENGTH" ]
+# ==> Recall that := is "default substitution" operator.
+# ==> So, if 'n' has not been initialized, set it to 1.
+do
+	PASS="$PASS${MATRIX:$(($RANDOM%${#MATRIX})):1}"
+	# ==> Starting from the innermost nesting...
+	# ==> ${#MATRIX} returns length of array MATRIX.
+	# ==> $RANDOM%${#MATRIX} returns random number between 1
+	# ==> and [length of MATRIX] - 1.
+	# ==> ${MATRIX:$(($RANDOM%${#MATRIX})):1}
+	# ==> returns expansion of MATRIX at random position, by length 1. 
+	# ==> See {var:pos:len} parameter substitution in Chapter 9.
+	# ==> and the associated examples.
+	# ==> PASS=... simply pastes this result onto previous PASS (concatenation).
+	# ==> To visualize this more clearly, uncomment the following line
+	#                 echo "$PASS"
+	# ==> to see PASS being built up,
+	# ==> one character at a time, each iteration of the loop.
+	let n+=1
+	# ==> Increment 'n' for next pass.
+done
+echo "$PASS"      # ==> Or, redirect to a file, as desired.
+exit 0
+#######################################################################################################
+#!/bin/bash
+# sd.bash: Calculates the Standard Deviation of a one-column text file of numbers
+# =========================================================== #
+count=0         # Number of data points; global.
+SC=9            # Scale to be used by bc. Nine decimal places.
+E_DATAFILE=90   # Data file error.
+# ----------------- Set data file ---------------------
+if [ ! -z "$1" ]  # Specify filename as cmd-line arg?
+then
+  datafile="$1" #  ASCII text file,
+else            #+ one (numerical) data point per line!
+  datafile=sample.dat
+fi              #  See example data file, below.
+
+if [ ! -e "$datafile" ]
+then
+  echo "\""$datafile"\" does not exist!"
+  exit $E_DATAFILE
+fi
+# -----------------------------------------------------
+arith_mean ()
+{
+  local rt=0         # Running total.
+  local am=0         # Arithmetic mean.
+  local ct=0         # Number of data points.
+
+  while read value   # Read one data point at a time.
+  do
+    rt=$(echo "scale=$SC; $rt + $value" | bc)
+    (( ct++ ))
+  done
+
+  am=$(echo "scale=$SC; $rt / $ct" | bc)
+
+  echo $am; return $ct   # This function "returns" TWO values!
+  #  Caution: This little trick will not work if $ct > 255!
+  #  To handle a larger number of data points,
+  #+ simply comment out the "return $ct" above.
+} <"$datafile"   # Feed in data file.
+
+sd ()
+{
+  mean1=$1  # Arithmetic mean (passed to function).
+  n=$2      # How many data points.
+  sum2=0    # Sum of squared differences ("variance").
+  avg2=0    # Average of $sum2.
+  sdev=0    # Standard Deviation.
+
+  while read value   # Read one line at a time.
+  do
+    diff=$(echo "scale=$SC; $mean1 - $value" | bc)
+    # Difference between arith. mean and data point.
+    dif2=$(echo "scale=$SC; $diff * $diff" | bc) # Squared.
+    sum2=$(echo "scale=$SC; $sum2 + $dif2" | bc) # Sum of squares.
+  done
+
+    avg2=$(echo "scale=$SC; $sum2 / $n" | bc)  # Avg. of sum of squares.
+    sdev=$(echo "scale=$SC; sqrt($avg2)" | bc) # Square root =
+    echo $sdev                                 # Standard Deviation.
+
+} <"$datafile"   # Rewinds data file.
+
+# ======================================================= #
+mean=$(arith_mean); count=$?   # Two returns from function!
+std_dev=$(sd $mean $count)
+echo
+echo "Number of data points in \""$datafile"\" = $count"
+echo "Arithmetic mean (average) = $mean"
+echo "Standard Deviation = $std_dev"
+echo
+# ======================================================= #
+exit
+#  This script could stand some drastic streamlining,
+# but not at the cost of reduced legibility, please.
+# ++++++++++++++++++++++++++++++++++++++++ #
+# A sample data file (sample.dat):
+# 18.35
+# 19.0
+# 18.88
+# 18.91
+# 18.64bv
+# $ bash sd.bash sample.dat
+# Number of data points in "sample.dat" = 5
+# Arithmetic mean (average) = 18.756000000
+# Standard Deviation = .235338054
+# ++++++++++++++++++++++++++++++++++++++++ #
+###########################################################################################################
+#!/bin/bash
+# colors.bash
+# Displays all 256 possible background colors, using ANSI escape sequences.
+# Author: Chetankumar Phulpagare
+# Used in ABS Guide with permission.
+T1=8
+T2=6
+T3=36
+offset=0
+for num1 in {0..7}
+do {
+   for num2 in {0,1}
+       do {
+          shownum=`echo "$offset + $T1 * ${num2} + $num1" | bc`
+          echo -en "\E[0;48;5;${shownum}m color ${shownum} \E[0m"
+          }
+       done
+   echo
+   }
+done
+offset=16
+for num1 in {0..5}
+do {
+   for num2 in {0..5}
+       do {
+          for num3 in {0..5}
+              do {
+                 shownum=`echo "$offset + $T2 * ${num3} \
+                 + $num2 + $T3 * ${num1}" | bc`
+                 echo -en "\E[0;48;5;${shownum}m color ${shownum} \E[0m"
+                 }
+               done
+          echo
+          }
+       done
+}
+done
+offset=232
+for num1 in {0..23}
+do {
+   shownum=`expr $offset + $num1`
+   echo -en "\E[0;48;5;${shownum}m ${shownum}\E[0m"
+}
+done
+echo
+#############################################################################################################
+#!/bin/bash
+# bingo.bash
+# Bingo number generator
+# Reldate 20Aug12, License: Public Domain
+#######################################################################
+# This script generates bingo numbers.
+# Hitting a key generates a new number.
+# Hitting 'q' terminates the script.
+# In a given run of the script, there will be no duplicate numbers.
+# When the script terminates, it prints a log of the numbers generated.
+#######################################################################
+
+MIN=1       # Lowest allowable bingo number.
+MAX=75      # Highest allowable bingo number.
+COLS=15     # Numbers in each column (B I N G O).
+SINGLE_DIGIT_MAX=9
+
+declare -a Numbers
+Prefix=(B I N G O)
+
+initialize_Numbers ()
+{  # Zero them out to start.
+   # They'll be incremented if chosen.
+   local index=0
+   until [ "$index" -gt $MAX ]
+   do
+     Numbers[index]=0
+     ((index++))
+   done
+
+   Numbers[0]=1   # Flag zero, so it won't be selected.
+}
+
+
+generate_number ()
+{
+   local number
+
+   while [ 1 ]
+   do
+     let "number = $(expr $RANDOM % $MAX)"
+     if [ ${Numbers[number]} -eq 0 ]    # Number not yet called.
+     then
+       let "Numbers[number]+=1"         # Flag it in the array.
+       break                            # And terminate loop.
+     fi   # Else if already called, loop and generate another number.
+   done
+   # Exercise: Rewrite this more elegantly as an until-loop.
+
+   return $number
+}
+print_numbers_called ()
+{   # Print out the called number log in neat columns.
+    # echo ${Numbers[@]}
+local pre2=0                #  Prefix a zero, so columns will align
+                            #+ on single-digit numbers.
+echo "Number Stats"
+
+for (( index=1; index<=MAX; index++))
+do
+  count=${Numbers[index]}
+  let "t = $index - 1"      # Normalize, since array begins with index 0.
+  let "column = $(expr $t / $COLS)"
+  pre=${Prefix[column]}
+# echo -n "${Prefix[column]} "
+
+if [ $(expr $t % $COLS) -eq 0 ]
+then
+  echo   # Newline at end of row.
+fi
+
+  if [ "$index" -gt $SINGLE_DIGIT_MAX ]  # Check for single-digit number.
+  then
+    echo -n "$pre$index#$count "
+  else    # Prefix a zero.
+    echo -n "$pre$pre2$index#$count "
+  fi
+
+done
+}
+
+# main () {
+RANDOM=$$   # Seed random number generator.
+
+initialize_Numbers   # Zero out the number tracking array.
+
+clear
+echo "Bingo Number Caller"; echo
+
+while [[ "$key" != "q" ]]   # Main loop.
+do
+  read -s -n1 -p "Hit a key for the next number [q to exit] " key
+  # Usually 'q' exits, but not always.
+  # Can always hit Ctl-C if q fails.
+  echo
+  generate_number; new_number=$?
+  let "column = $(expr $new_number / $COLS)"
+  echo -n "${Prefix[column]} "   # B-I-N-G-O
+  echo $new_number
+done
+echo; echo
+# Game over ...
+print_numbers_called
+echo; echo "[#0 = not called . . . #1 = called]"
+echo
+exit 0
+# }
+###########################################################################################################
+#!/bin/bash
+#  assoicarry.bash
+#  Benchmark test script to compare execution times of
+#  numeric-indexed array vs. associative array.
+#     Thank you, Erik Brandsberg.
+
+count=10000       # May take a while for some of the tests below.
+declare simple     # Can change to 20000, if desired.
+declare -a array1
+declare -A array2
+declare -a array3
+declare -A array4
+
+echo "===Assignment tests==="
+echo
+
+echo "Assigning a simple variable:"
+# References $i twice to equalize lookup times.
+time for (( i=0; i< $count; i++)); do
+        simple=$i$i
+done
+
+echo "---"
+
+echo "Assigning a numeric index array entry:"
+time for (( i=0; i< $count; i++)); do
+        array1[$i]=$i
+done
+
+echo "---"
+
+echo "Overwriting a numeric index array entry:"
+time for (( i=0; i< $count; i++)); do
+        array1[$i]=$i
+done
+
+echo "---"
+
+echo "Linear reading of numeric index array:"
+time for (( i=0; i< $count; i++)); do
+        simple=array1[$i]
+done
+
+echo "---"
+
+echo "Assigning an associative array entry:"
+time for (( i=0; i< $count; i++)); do
+        array2[$i]=$i
+done
+
+echo "---"
+
+echo "Overwriting an associative array entry:"
+time for (( i=0; i< $count; i++)); do
+        array2[$i]=$i
+done
+
+echo "---"
+
+echo "Linear reading an associative array entry:"
+time for (( i=0; i< $count; i++)); do
+        simple=array2[$i]
+done
+
+echo "---"
+
+echo "Assigning a random number to a simple variable:"
+time for (( i=0; i< $count; i++)); do
+        simple=$RANDOM
+done
+
+echo "---"
+
+echo "Assign a sparse numeric index array entry randomly into 64k cells:"
+time for (( i=0; i< $count; i++)); do
+        array3[$RANDOM]=$i
+done
+
+echo "---"
+
+echo "Reading sparse numeric index array entry:"
+time for value in "${array3[@]}"i; do
+        simple=$value
+done
+
+echo "---"
+
+echo "Assigning a sparse associative array entry randomly into 64k cells:"
+time for (( i=0; i< $count; i++)); do
+        array4[$RANDOM]=$i
+done
+
+echo "---"
+
+echo "Reading sparse associative index array entry:"
+time for value in "${array4[@]}"; do
+        simple=$value
+done
+
+exit $?
