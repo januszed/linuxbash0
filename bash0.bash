@@ -187,6 +187,11 @@ sudo rm /var/log/kern.log.1
 sudo find /var/log -type f -iname '*.log' -delete
 sudo find /var/log -type f -iname '*.gz' -delete
 sudo find /var/log -type f -iname '*.log.old' -delete
+# clear firefox cache
+cd /home/dave/.cache/mozilla/firefox/lcnz85cr.default/Cache 
+rm -rf 0; rm -rf 1; rm -rf 2; rm -rf 3; rm -rf 4; rm -rf 5;
+rm -rf 6; rm -rf 7;rm -rf 8; rm -rf 9; 
+rm -rf A; rm -rf B; rm -rf C;
 #installing some packages and then removing them
 sudo apt-get install cmake kdebase-workspace-dev libqjson-dev git libqca2-dev
 sudo apt-get --purge remove cmake kdebase-workspace-dev libqjson-dev git libqca2-dev
@@ -204,7 +209,7 @@ sudo cp jre-7u45-linux-x64.tar.gz /usr/java/jre-7u45-linux-x64.tar.gz
 sudo tar zxvf jre-7u45-linux-x64.tar.gz
 #Remove the tarball to save disk space
 sudo rm jre-7u45-linux-x64.tar.gz
-########################################################
+###########################################################################################################
 #Alternative Java installation
 sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
@@ -215,7 +220,26 @@ sudo apt-get install firefox
 exec R
 #Run octave interactively - type quit() to exit
 exec octave
-#view the version of the GNU C and GNU C++ compilers
+#########################################################################################################
+#Perl Programming - view the location of the perl interpreter
+which perl
+# Write the following program and give it the name hello.pl
+#!/usr/bin/perl -w 
+#classic hello world shit
+print "Hello world!\n"
+# At the bash command line - write the following command to execute the perl hello world program
+perl hello.pl
+########################################################################################################
+#Python programming - view the location of the python interpreter
+which python
+# Write the following program and give it the name hello.py
+#!/usr/bin/python
+#Classic hello world shit in python
+print("Hello world!")
+# At the bash command line - write the following command to execute the python hello world program
+python hello.py
+########################################################################################################
+#C Programming - view the version of the GNU C and GNU C++ compilers
 gcc --version
 gcc -v
 man gcc
@@ -223,18 +247,21 @@ gcc --help
 g++ --version
 #send the manual to a text file (view it online at: http://linux.die.net/man/1/gcc)
 man gcc | col -b > gcc.txt
+which gcc
+# write the following hello world program and save it to a file called hello.c
+//usr/bin/gcc
+//Classic hello world shit in C
+#include <stdio.h>
+int main() {
+    printf("Hello, world!\n");
+    return 0;
+}
 #Compile and link source file hello.c into executable hello.exe
-cd /home/dave/Documents/CppWOF
+cd /home/dave/Documents
 gcc -o hello.exe hello.c
 #Execute hello.exe under the Bash shell, specifying the current path (./)
 ./hello.exe
-#Compile-only with -c option
-g++ -c -Wall -g dice.cpp
-#Link object file(s) into an executable
-g++ -g -o dice.exe dice.o
-#Run the program
-./dice.exe
-#Preprocessing (via C pre-processor cpp), compilation (gcc), assembler (as.exe), linker
+#Another method - Preprocessing (via C pre-processor cpp), compilation (gcc), assembler (as.exe), linker
 cpp hello.c > hello.i
 gcc -S hello.i
 as -o hello.o hello.s
@@ -243,6 +270,63 @@ ld -o hello.exe hello.o
 cpp -v
 #compile in verbose mode (-v) to study the library-paths (-L) and libraries (-l)
 gcc -v -o hello.exe hello.c 
+# Yet another hello world program in C - this time using a character array stored as a string constant
+// More classic hello world shit in C
+#include <stdio.h>
+ int main()
+{
+  char string[] = "Hello World Part II";
+  printf("%s\n", string);
+  return 0;
+}
+# save the program as hello2.c
+cd /home/dave/Documents
+gcc -o hello2.exe hello2.c
+#Execute hello2.exe under the Bash shell, specifying the current path (./)
+./hello2.exe
+# The hello world infinte loop
+#include <stdio.h>
+#define TRUE 1
+int main()
+{
+  while (TRUE)
+  {
+    printf("Hello World\n");
+  }
+  return 0;
+}
+# save the program as hello3.c
+cd /home/dave/Documents
+gcc -o hello3.exe hello3.c
+#Execute hello3.exe under the Bash shell, specifying the current path (./)
+./hello3.exe
+# Increment operators in C
+// Example of increment operators in C
+#include <stdio.h>
+int main()
+{
+    int age;
+    printf("Enter your age in years:");
+    scanf("%d",&age);
+    printf("You are %d years old.\n",age);
+    age--;
+    printf("Last year you were %d.\n",age);
+    age++;
+    age++;
+    printf("In one year you'll be %d.\n",age);
+    return(0);
+}
+# save the program as age.c
+gcc -o age.exe age.c
+./age.exe
+##########################################################################################################
+# Example of running some other programs using the C++ and C compilers
+#Compile-only with -c option
+g++ -c -Wall -g dice.cpp
+#Link object file(s) into an executable
+g++ -g -o dice.exe dice.o
+#Run the program
+./dice.exe
 #Compile the Matrix Multiplicaiton Example
 gcc -c -Wall -g matrix.c
 #Link object file(s) into an executable
@@ -305,6 +389,7 @@ vi nums.txt
 1 2 3 4
 5 6 7 8
 9 10 11 12
+################################################################################################################
 # awk - a data driven scripting language
 # $NF prints the last field when you use awk
 awk '{print $NF}' nums.txt
@@ -903,11 +988,160 @@ sed '2,/^$/ d' sample1>sample2
 # delete all lines except for ones that contain the phrase "two"
 sed '/two/ !d' sample1>sample2
 cat sample2
+# Scheduling with crontab
+# shell scripts (/usr/lib/sa/sa1 and /usr/lib/sa/sa2) are structured to be run by the cron command and provide daily statistics and reports.
+# sample stanzas are included (but commented out) in the /var/spool/cron/crontabs/adm crontab fil
+# AIX Specific Commands
+#     		From the Unix Rosetta Stone at http://bhami.com/rosetta.html
+# AIX Version 7.1 Differences Guide http://www.redbooks.ibm.com/redbooks/pdfs/sg247910.pdf
+# ls - the List Segments Command
+# list user account attributes - executable located at /usr/sbin/lsuser
+lsuser -c -a home djanusz
+# list user account attributes in stanza form
+lsuser -f djanusz
+# list device attributes
+lsattr -E -l sys0
+# list the system configuration and vital product data (VPD)
+lscfg -vps | less
+# list system devices and their characteristics
+lsdev
+# displays information about a physical volume within a volume group.
+lspv
+# list information about the sas02lv
+lslv sas02lv
+# list the status of a subsystem, a group of subsystems, or a subserver
+lssrc -h lakrsaspr0 -a
+# list the status of the tcpip subsystem group, enter:
+lssrc  -g tcpip
+# list paging space commnad to check the swap space
+lsps -a
+# list filesystems
+lsfs
+# list records from the audit log.
+lsaudrec
+# list installed software products
+lslpp -w
+# display information about installed filesets on my system
+lspp -l
+# list the fileset that owns all file names that contain teradata
+lslpp -w "*teradata*"
+# display information about a volume group
+lsvg
+# list all characteristics of the rootvg
+lsvg rootvg
+# AIX - System and Process Commands
+# 	http://publibn.boulder.ibm.com/doc_link/en_US/a_doc_lib/aixuser/usrosdev/usrosdev.pdf
+#	http://publib.boulder.ibm.com/infocenter/aix/v6r1/index.jsp
+# print the system configuration information - system model, processors, cpu type
+prtconf -svLm
+# version, release and maintenance level of AIX (also try lslpp -h bos.rte)
+oslevel -r
+# find the fileset for the vmstat binary
+which_fileset vmstat
+# installs filesets associated with keywords or fixes.
+instfix -i
+# configures or displays network interface parameters for a network using TCP/IP
+ifconfig -a
+# the ip address
+host lakrsaspr0
+# display routing table information for an Internet interface
+netstat -r -f inet
+# display interface information for an Internet interface
+netstat -i -f inet
+# reports virtual memory statistics
+vmstat
+# show ethernet device driver and device statistics for the en1 device
+entstat -d en1
+# captures and analyzes a snapshot of virtual memory
+svmon -Pgt 3
+# displays statistical information about the Network File System (NFS) and Remote Procedure Call (RPC) calls
+nfsstat -r 
+# display information about the number of RPC and NFS calls received and rejected by the server
+nfsstat -s
+# Collects and displays performance statistics for all logical processors in the system
+mpstat
+# reports logical partition (LPAR) related information and statistics.
+lparstat
+# To get the information about the partition
+lparstat -i
+# To get statistics about the shared memory pool and the I/O memory entitlement of the partition
+lparstat -m
+# get statistics about I/O memory pools inside the LPAR
+lparstat -me
+# topas - the Top Resource Usage Monitor - /usr/bin/topas contains the topas command
+# reports selected local and remote system statistics (run the program with the default options)
+topas
+# go directly to the topas Workload Partitions (WPAR) mode
+topas -@
+# display the ten most active processes
+topas -p10 -n0 -d0 -f0
+# go directly to system processes
+topas -P
+# go directly to the disk metric display
+topas -D
+# go directly to the file system display
+topas -F
+# go to the shared Ethernet adapter on the VIO Server Panel
+topas -E
+# information and process information
+topas -i5 -n0 -p0 -w0 -f0
+# interactive commands - topas_nmon
+topas_nmon
+# interactive commands - system management interface tool
+smit
+#############################################################################################################
+#!/bin/bash
+#Description: count files in a directory
+dir=$1
+numFiles=$( ls -l $dir | grep ^- | wc -l )
+echo Number of files: $numFiles
+numDirs=$( ls -l $dir  | grep ^d | wc -l )
+echo Number of dirs: $numDirs
+numLnks=$( ls -l $dir | grep ^l | wc -l )
+echo Number of Links: $numLnks
+#let Total=$numFiles+$numDirs+numLnks
+(( Total = numFiles+numDirs+numLnks ))
+echo Total Items: $Total
+echo first Arg: $1
+echo second Arg: $2
+echo third Arg: $3
+###################################################################################################################
+#!/bin/bash
+#Description: word count of files in a directory
+for c in $(ls -a); do
+  if [ -f $c ]
+  then
+    #let numFile+=1
+    (( numFiles += 1 ))
+    numLines=$( wc -l < $c )
+    echo File: $c has $numLines lines
+else
+    if [ -d $c ]
+    then
+      (( numDirs = numDirs +1 ))
+      ls -l $c
+else
+    if [ -l $c ]
+    then
+      let numLnks+=1
+      echo Link: $c
+    else
+      echo $c is not a File, dir or link
+      let numUnks+=1
+    fi
+  fi
+fi
+done
+echo Number of files: $numFiles
+echo Number of directories: $numDirs
+echo Number of links: $numLnks
+((TotalNum= numFiles + numDirs + numLnks + numUnks))
+echo Total number of files and folders: $TotalNum
 ################################################################################################################
 #!/bin/bash
 #Description: a short list of my hobbies
 echo "The things that I like to do include: "
-for myhobbies in smoke, drink, rap
+for myhobbies in smoking, drinking, programming, rapping
 do
         echo $myhobbies
 done
@@ -1513,3 +1747,18 @@ time for value in "${array4[@]}"; do
 done
 
 exit $?
+#############################################################################################################
+#!/bin/bash
+# stockqt.bash: Download a stock quote.
+read -p "Provide a ticker symbol: " tick
+E_NOPARAMS=86
+stock_symbol=$1
+file_suffix=.html
+# Fetches an HTML file.
+URL="http://finance.yahoo.com/q?s=$tick"
+# Yahoo finance board, with stock query suffix.
+# -----------------------------------------------------------
+wget -i ${stock_symbol}${file_suffix} "${URL}${stock_symbol}"
+# -----------------------------------------------------------
+exit $?
+#############################################################################################################
