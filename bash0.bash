@@ -51,7 +51,7 @@
 #          :sh - start the command line
 #          /etc/vim/vimrc - config file can be edited to customize commands
 #                    (e.g.  map <Esc><Esc> :w<CR>  for triple Esc to save)
-########################################################################################################################
+######################################################################################################################
 #manual of the man command
 man man #spacebar to move forward, Esc,V to move back, / to search and Q to exit
 #view section 5 (file formats) of the passwd command
@@ -64,18 +64,24 @@ info ls
 whatis cal
 #apropos = man -k
 apropos cal
+# view comamnds and files (ar is to create, modify and extract from archives)
+apropos ar | less
 #help on the ls command
 ls --help
 #list all files that start with the word linux (asterisk wildcard)
 ls linux*
+# View the tpe of commands (built-in or shell command and the location of binaries)
+type who; type cd;
 #change wd
 cd Documents
-#go home
-cd ~
-#go back
-cd ..
+#go home, to parent, back to where you came from
+cd ~; cd..; cd -;
 #print wd (internal)
 pwd
+#pipe the pwd command to the basename command to get just the name of the current folder
+pwd | xargs basename
+#pipe the pwd command to get the path, except for the current folder
+pwd | xargs dirname
 #list permissions, group, owner, filesize, date and filename
 ls -l
 #view last access date instead of last modification date
@@ -161,15 +167,8 @@ sudo iptables -L
 #/var/tmp can probably be removed. Much in various /var/cache-directories
 cd /var
 ls -a
-#Script to print the size of a file if it is smaller than 9000 B
-FILENAME=apt.extended_states.5.gz
-SIZE=$(du -sb $FILENAME | awk '{ print $1 }')
-if ((SIZE<1000000)); then 
-    echo $SIZE; 
-else 
-    echo "File greater than 1 MB file"; 
-fi
-dsfg
+# view the current system (32 or 64 bit)
+uname -a
 #view the file sizes in the cache
 du /var/cache/apt/archives
 #remove cache files
@@ -198,7 +197,11 @@ sudo apt-get --purge remove cmake kdebase-workspace-dev libqjson-dev git libqca2
 #remove all directories and subdirectories from a failed install
 cd /home/dave
 sudo rm -rf kdeconnect-kde
-######################Installing Java###########################
+# installing and then removing rpm with apt-get
+sudo apt-get install rpm
+sudo apt-get remove rpm
+sudo apt-get purge rpm
+############################################################################################################
 #Change to the directory in which you want to install
 cd /usr
 sudo mkdir java
@@ -216,6 +219,18 @@ sudo apt-get update
 sudo apt-get install oracle-java7-installer
 #installing firefox
 sudo apt-get install firefox
+##########################################################################################################
+# Programming Languages
+# Perl - http://www.perl.com/
+man perl
+# Python - http://www.python.org/
+man python
+# C - http://www.gnu.org/software/gcc/
+man gcc
+# FORTRAN - http://www.gnu.org/software/fortran/fortran.html
+man g77
+# Ada - http://www.gnu.org/software/gnat/gnat.html
+info gnat
 #Run R interactively - type q() to exit
 exec R
 #Run octave interactively - type quit() to exit
@@ -460,11 +475,12 @@ rm ?clust*
 #move (rename) a file
 cd ~/Documents/CppWOF
 mv avg.cpp avg2.cpp
-#find allows you to search for files
-cd ~/Documents/RSAS
-find *sas*
-#find all files that contain means in the pathname
-find -type f | grep means
+# Display statistics about memory usage (in MB)
+free -m 
+# view the version of the free command
+free -V
+# List the header files that have at least one #include directive
+grep -l '*#include*' /usr/include/*
 #recursively zip all files from backups
 zip -r backups2.zip backups
 #create archive.tar from files avg2.cpp and dice.cpp
@@ -765,6 +781,18 @@ awk '/joe/{print}' sorted1.data
 awk '/joe/{print $3}' sorted1.data
 # The delimiter is a colon and the action is to print the second and third columns
 awk -F: '/Jones/{print $2,$3}' names.data
+# batch editing with awk
+# data in file1.txt
+14      15      16
+15      15      11
+5       56      6
+5       25      1
+# print columns 1 and 2
+awk '{print $1,$2}' file1.txt
+# multiply columns 1 and 2 and redirect output to a new file
+awk '{print $1, $2, $1*$2}' file1.txt > file2.txt
+# remove the first column with the printf function (works like the C printf function)
+awk '{ for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"; }' file1.txt
 # create the employees file
 # vi employees
 409,John Baker,56000,civil engineering
@@ -889,6 +917,7 @@ expr length "Linux is the best"
 expr substr "Linux is the best" 7 8
 expr index "Linux is the best" "x" 
 # Enter the following into the data1 file for the grep example that follows
+# Commands of the grep family search the input files for lines matching a pattern
 Harry is smart
 Harry
 His name is Harry
@@ -957,10 +986,27 @@ grep '^[1-9]' num.list
 grep 'te*' num.list
 # lines that contain "te"
 grep 'tee*' num.list
+# Search recursively
+grep -r [Ss][Aa][Ss] ~/Documents/*
+#find allows you to search for files
+cd ~/Documents/RSAS
+find *sas*
+#find all files that contain means in the pathname
+find -type f | grep means
+ List all files and subdirectories in your home directory
+find $HOME -print
+# Search the filesystem, beginning at root, for files that end with .sas
+find / -name '*sas*'
+# search sas files for the word proc (include both upper lower case) and remove errors by sending them to null
+find /home/dave/Documents -name '*sas*' | xargs grep '[Pp][Rr][Oo][Cc]' 2> /dev/null 
+# find files based on two conditions with the and operator
+find /home/dave/Documents -name '*sas*' and -size +10
 # view the users logged into psuedoterminals (pts)
 who | grep 'pts'
 # Create a new file called young and enter the text the "the night is young"
 vim young
+# find and replace with the ed text editor (, is all lines, s is find and replace, w is write, \n newline, q quit)
+printf ",s/echo/pr\nw\nq\n" | ed bashbang2.bash
 # Find and replace the word night with day and save the file as youngday
 sed 's/night/day/' young>youngday
 # This outputs the word "Sunnight Monday"
@@ -1107,7 +1153,8 @@ echo second Arg: $2
 echo third Arg: $3
 ###################################################################################################################
 #!/bin/bash
-#Description: word count of files in a directory
+#bashbang.bash - word count of files in a directory
+#Usage:   bash<bashbang.bash
 for c in $(ls -a); do
   if [ -f $c ]
   then
@@ -1137,6 +1184,107 @@ echo Number of directories: $numDirs
 echo Number of links: $numLnks
 ((TotalNum= numFiles + numDirs + numLnks + numUnks))
 echo Total number of files and folders: $TotalNum
+#Exploring the UNIX Version 7 Manual
+# Commands- cat (catenate & print), ls (list segments), cd (change directory), cc (C compiler),
+#           pwd (print working directory), sh (shell), chmod (change mode),             
+#           cp (copy), df (disk free), diff (differential file comparator), du (disk usage)
+#           echo (echo args), env (environment variables), 
+# using the bc language for calcuations
+echo "scale=10;sqrt(10)" | bc
+# converting decimal (input base) to binary (output base) for the number 21
+echo 'obase=2;ibase=10;21' | bc
+# Euler's number
+echo 'e(1)' | bc -l
+# Euler's constant - exp(1), exp(2),....,exp(10)
+echo 'scale = 20
+      define exp(x){
+      auto a, b, c, i, s
+      a = 1
+      b = 1
+      s = 1
+      for(i=1; 1==1; i++){
+	a = a*x
+	b = b*i
+	c = a/b
+	if(c == 0) return(s)
+	s = s+c
+	}
+      }	
+for(i=1; i<=10; i++) exp(i)' | bc -l
+# sqrt((12+(-3)^4)/11)-22
+echo '12 _3 4 ^ + 11 / v 22 - p' | dc
+# print prime numbers with the dc (Reverse Polish Notation)
+ echo '2p3p[dl!d2+s!%0=@l!l^!<#]s#[s/0ds^]s@[p]s&[ddvs^3s!l#x0<&2+l.x]ds.x'| dc
+# change mode - denies write permission to others
+chmod o-w bashbang.bash
+# make the file executable 
+chmod +x bashbang.bash
+# copy the bashbang.bash file into a second file and then compare them with cmp (simalar to comm, diff, uniq)
+cp bashbang.bash bashbang2.bash
+# compare the files
+cmp -s bashbang.bash bashbang2.bash
+# view the exit status (the exit status should be 0 as the files compared are the exact same)
+echo $?
+# view the exit status of true
+true    # The "true" builtin.
+echo "exit status of \"true\" = $?"     # 0
+# view the exit status of false
+! true
+echo "exit status of \"! true\" = $?"   # 1
+# view the exit status of an error
+lsfcukthis
+echo "exit status of \"lsfcukthis\" = $?"   # 127 (command not found)
+# view the exit status of another type of error
+ls -z
+echo "exit status of \"ls -z\" = $?"  #2 (misuse of shell built-ins)
+# date can be used to view the date, or to set the date
+date
+# dd command to convert and copy files - create a file with 100 random bytes using the kernels random driver
+dd if=/dev/urandom of=myrandom bs=100 count=1
+# convert the bashang.bash file to uppercase 
+dd if=bashbang.bash of=bashbangUp.bash conv=ucase
+# view the file and see that it is all uppercase letters now
+cat bashbangUp.bash
+############################################################################################################
+# The Bash Shell - input/output, redirection, wildcard characters, shell variables to customize the env,
+#                  shell functions for modularizing tasks, job control, command history, integer arithmetic,
+#                  arrays, aliasing, built-in commands, loops and conditional execution. 
+# Bash Documentation - http://www.gnu.org/software/bash/
+############################################################################################################
+# functions in bash - word count of filenames
+function fcount {
+ls | wc -l
+}
+fcount
+############################################################################################################
+#!/bin/bash
+#Description: an example of conditional execution with Bash
+#             type sudo su to become the superuser
+if [ `whoami` = "root" ]
+then
+        echo "You are the superuser"
+elif [ "$USER" = "root" ]
+then
+        echo "You might be the superuser"
+else
+read -p "How much money do you got?" bribe
+        if [ $bribe -gt 10000 ]
+        then
+                echo "You can pay to be the superuser"
+        else
+                echo "You are just an ordinary dude."
+        fi
+fi
+############################################################################################################
+#!/bin/bash
+#Descrition: script to print the size of a file if it is smaller than 9000 B
+read -p "Give a filename in the cwd: " FILENAME
+SIZE=$(du -sb $FILENAME | awk '{ print $1 }')
+if ((SIZE<1000000)); then
+    echo $SIZE;
+else
+    echo "File greater than 1 MB file";
+fi
 ################################################################################################################
 #!/bin/bash
 #Description: a short list of my hobbies
@@ -1153,7 +1301,6 @@ for hob in `cat myhob`
 do
         echo $hob
 done
-
 ################################################################################################################
 #!/bin/bash
 # Description: Write a shell script whose single command line argument is a file. If you run the
@@ -1238,10 +1385,8 @@ exit 0
 # Usage: ./daysbtw.bash [M]M/[D]D/YYYY [M]M/[D]D/YYYY
 #        for example, use the command
 #        $ bash daysbtw.bash 10/10/2010 10/10/2014
-
 ARGS=2                # Two command-line parameters expected.
 E_PARAM_ERR=85        # Param error.
-
 REFYR=1600            # Reference year.
 CENTURY=100
 DIY=365
@@ -1249,21 +1394,18 @@ ADJ_DIY=367           # Adjusted for leap year + fraction.
 MIY=12
 DIM=31
 LEAPCYCLE=4
-MAXRETVAL=255         #  Largest permissible
-                      
+MAXRETVAL=255         #  Largest permissible                      
 diff=                 # Declare global variable for date difference.
 value=                # Declare global variable for absolute value.
 day=                  # Declare globals for day, month, year.
 month=
 year=
-
 Param_Error ()        # Command-line parameters wrong.
 {
   echo "Usage: `basename $0` [M]M/[D]D/YYYY [M]M/[D]D/YYYY"
   echo "       (date must be after 1/3/1600)"
   exit $E_PARAM_ERR
 }  
-
 Parse_Date ()                 # Parse date from command-line params.
 {
   month=${1%%/**}
@@ -1271,7 +1413,6 @@ Parse_Date ()                 # Parse date from command-line params.
   day=${dm#*/}
   let "year = `basename $1`"  # Not a filename, but works just the same.
 }  
-
 check_date ()                 # Checks for invalid date(s) passed.
 {
   [ "$day" -gt "$DIM" ] || [ "$month" -gt "$MIY" ] ||
@@ -1281,7 +1422,6 @@ check_date ()                 # Checks for invalid date(s) passed.
   #
   # Exercise: Implement more rigorous date checking.
 }
-
 strip_leading_zero () #  Better to strip possible leading zero(s)
 {                     #+ from day and/or month
   return ${1#0}       #+ since otherwise Bash will interpret them
@@ -1306,7 +1446,6 @@ day_index ()          # Gauss' Formula:
   echo $Days
 
 }  
-
 calculate_difference ()            # Difference between two day indices.
 {
   let "diff = $1 - $2"             # Global variable.
@@ -1352,15 +1491,12 @@ exit 0
 # Original script copyright 1993, by Alec Muffett.
 # Description:  This script processes text files to produce a sorted list of words found in the files.
 # Example of Usage :  $ bash mkdict.bash filetoprocess.txt > savetofile.txt
-
 E_BADARGS=85
-
 if [ ! -r "$1" ]                    #  Need at least one
 then                                #+ valid file argument.
   echo "Usage: $0 files-to-process"
   exit $E_BADARGS
 fi  
-
 cat $* |                            #  Dump specified files to stdout.
         tr A-Z a-z |                #  Convert to lowercase.
         tr ' ' '\012' |             #  New: change spaces to newlines.
@@ -1431,21 +1567,14 @@ arith_mean ()
   local rt=0         # Running total.
   local am=0         # Arithmetic mean.
   local ct=0         # Number of data points.
-
   while read value   # Read one data point at a time.
   do
     rt=$(echo "scale=$SC; $rt + $value" | bc)
     (( ct++ ))
   done
-
   am=$(echo "scale=$SC; $rt / $ct" | bc)
-
   echo $am; return $ct   # This function "returns" TWO values!
-  #  Caution: This little trick will not work if $ct > 255!
-  #  To handle a larger number of data points,
-  #+ simply comment out the "return $ct" above.
 } <"$datafile"   # Feed in data file.
-
 sd ()
 {
   mean1=$1  # Arithmetic mean (passed to function).
@@ -1453,7 +1582,6 @@ sd ()
   sum2=0    # Sum of squared differences ("variance").
   avg2=0    # Average of $sum2.
   sdev=0    # Standard Deviation.
-
   while read value   # Read one line at a time.
   do
     diff=$(echo "scale=$SC; $mean1 - $value" | bc)
@@ -1461,13 +1589,10 @@ sd ()
     dif2=$(echo "scale=$SC; $diff * $diff" | bc) # Squared.
     sum2=$(echo "scale=$SC; $sum2 + $dif2" | bc) # Sum of squares.
   done
-
     avg2=$(echo "scale=$SC; $sum2 / $n" | bc)  # Avg. of sum of squares.
     sdev=$(echo "scale=$SC; sqrt($avg2)" | bc) # Square root =
     echo $sdev                                 # Standard Deviation.
-
 } <"$datafile"   # Rewinds data file.
-
 # ======================================================= #
 mean=$(arith_mean); count=$?   # Two returns from function!
 std_dev=$(sd $mean $count)
@@ -1543,22 +1668,19 @@ echo
 # bingo.bash
 # Bingo number generator
 # Reldate 20Aug12, License: Public Domain
-#######################################################################
+############################################################################################################
 # This script generates bingo numbers.
 # Hitting a key generates a new number.
 # Hitting 'q' terminates the script.
 # In a given run of the script, there will be no duplicate numbers.
 # When the script terminates, it prints a log of the numbers generated.
-#######################################################################
-
+############################################################################################################
 MIN=1       # Lowest allowable bingo number.
 MAX=75      # Highest allowable bingo number.
 COLS=15     # Numbers in each column (B I N G O).
 SINGLE_DIGIT_MAX=9
-
 declare -a Numbers
 Prefix=(B I N G O)
-
 initialize_Numbers ()
 {  # Zero them out to start.
    # They'll be incremented if chosen.
@@ -1568,15 +1690,11 @@ initialize_Numbers ()
      Numbers[index]=0
      ((index++))
    done
-
    Numbers[0]=1   # Flag zero, so it won't be selected.
 }
-
-
 generate_number ()
 {
    local number
-
    while [ 1 ]
    do
      let "number = $(expr $RANDOM % $MAX)"
@@ -1587,7 +1705,6 @@ generate_number ()
      fi   # Else if already called, loop and generate another number.
    done
    # Exercise: Rewrite this more elegantly as an until-loop.
-
    return $number
 }
 print_numbers_called ()
@@ -1596,7 +1713,6 @@ print_numbers_called ()
 local pre2=0                #  Prefix a zero, so columns will align
                             #+ on single-digit numbers.
 echo "Number Stats"
-
 for (( index=1; index<=MAX; index++))
 do
   count=${Numbers[index]}
@@ -1604,30 +1720,23 @@ do
   let "column = $(expr $t / $COLS)"
   pre=${Prefix[column]}
 # echo -n "${Prefix[column]} "
-
 if [ $(expr $t % $COLS) -eq 0 ]
 then
   echo   # Newline at end of row.
 fi
-
   if [ "$index" -gt $SINGLE_DIGIT_MAX ]  # Check for single-digit number.
   then
     echo -n "$pre$index#$count "
   else    # Prefix a zero.
     echo -n "$pre$pre2$index#$count "
   fi
-
 done
 }
-
 # main () {
 RANDOM=$$   # Seed random number generator.
-
 initialize_Numbers   # Zero out the number tracking array.
-
 clear
 echo "Bingo Number Caller"; echo
-
 while [[ "$key" != "q" ]]   # Main loop.
 do
   read -s -n1 -p "Hit a key for the next number [q to exit] " key
@@ -1652,100 +1761,74 @@ exit 0
 #  Benchmark test script to compare execution times of
 #  numeric-indexed array vs. associative array.
 #     Thank you, Erik Brandsberg.
-
 count=10000       # May take a while for some of the tests below.
 declare simple     # Can change to 20000, if desired.
 declare -a array1
 declare -A array2
 declare -a array3
 declare -A array4
-
 echo "===Assignment tests==="
 echo
-
 echo "Assigning a simple variable:"
 # References $i twice to equalize lookup times.
 time for (( i=0; i< $count; i++)); do
         simple=$i$i
 done
-
 echo "---"
-
 echo "Assigning a numeric index array entry:"
 time for (( i=0; i< $count; i++)); do
         array1[$i]=$i
 done
-
 echo "---"
-
 echo "Overwriting a numeric index array entry:"
 time for (( i=0; i< $count; i++)); do
         array1[$i]=$i
 done
-
 echo "---"
-
 echo "Linear reading of numeric index array:"
 time for (( i=0; i< $count; i++)); do
         simple=array1[$i]
 done
-
 echo "---"
-
 echo "Assigning an associative array entry:"
 time for (( i=0; i< $count; i++)); do
         array2[$i]=$i
 done
-
 echo "---"
-
 echo "Overwriting an associative array entry:"
 time for (( i=0; i< $count; i++)); do
         array2[$i]=$i
 done
-
 echo "---"
-
 echo "Linear reading an associative array entry:"
 time for (( i=0; i< $count; i++)); do
         simple=array2[$i]
 done
-
 echo "---"
-
 echo "Assigning a random number to a simple variable:"
 time for (( i=0; i< $count; i++)); do
         simple=$RANDOM
 done
-
 echo "---"
-
 echo "Assign a sparse numeric index array entry randomly into 64k cells:"
 time for (( i=0; i< $count; i++)); do
         array3[$RANDOM]=$i
 done
-
 echo "---"
-
 echo "Reading sparse numeric index array entry:"
 time for value in "${array3[@]}"i; do
         simple=$value
 done
-
 echo "---"
-
 echo "Assigning a sparse associative array entry randomly into 64k cells:"
 time for (( i=0; i< $count; i++)); do
         array4[$RANDOM]=$i
 done
-
 echo "---"
-
 echo "Reading sparse associative index array entry:"
 time for value in "${array4[@]}"; do
         simple=$value
 done
-
 exit $?
 #############################################################################################################
 #!/bin/bash
